@@ -17,10 +17,9 @@ def load_expenses(filename = 'expenses.txt'):
         expenses = []
     return expenses
 
-def add_expense(date,amount,description):
-    global expense_id_counter
+def add_expense(expense_id_counter,date,amount,description):
     # Capture the current timestamp
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Format: YYYY-MM-DD HH:MM:SS
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Format: YYYY-MM-DD HH:MM:SS
     expense_id_counter +=1
     expense_id = f"EX{expense_id_counter:04d}"
     # one dictionary object will be one expense 
@@ -54,6 +53,7 @@ def total_expenses():
         return
     total = sum(int(ex['amount']) for ex in expenses)
     print(f"Total Expenses : {total}")
+    return total
 
 def delete_expense(expense_id):
     for id,ex in enumerate(expenses): #enumerate is built-in function which returns both ID and object
@@ -82,7 +82,7 @@ def search_expenses(expense_id=None,date=None):
 def edit_expense(expense_id,new_date = None, new_amount = None, new_description = None):
     for ex in expenses:
         if ex['id'] == expense_id:
-            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             if new_date is not None:
                 ex['date'] = new_date
                 ex['timestamp'] = timestamp
@@ -95,8 +95,9 @@ def edit_expense(expense_id,new_date = None, new_amount = None, new_description 
             
             print(f"Expense Updated for {expense_id} at {timestamp}!")
             save_expenses()
-    else:
-        print("Invalid index.")
+            return 1
+    return 0
+        
     
 
 def show_menu():
@@ -106,4 +107,83 @@ def show_menu():
     print("4. View Expenses")
     print("5. Search Expenses")
     print("6. Total Expenses")
-    print("7. Exit")
+    print("7. Summery Report")
+    print("8. Exit")
+
+
+def spending_by_date(date):
+    total = sum(int(ex['amount']) for ex in expenses if ex['date'] == date)
+    print(f"Total spending on {date} is ${total:.2f}")
+    return total
+
+
+def spending_by_category():
+    category_total= {}
+    # This code calculates the total amount spent in each category by treating the description field of each expense as the category and adding up the amounts spent in each one. It handles the case where a new category is encountered by initializing it with 0.
+    for ex in expenses:
+        category = ex['description']
+        category_total[category] = int(category_total.get(category,0)) + int(ex['amount'])
+
+    print("Spending by Category : ")
+    for category,total in category_total.items():
+        print(f"{category} : ${total:.2f}")
+    return category_total
+
+def avg_daily_spending():
+    if not expenses:
+        print("No expenses to calculate")
+        return 0
+    # Extract unique dates
+    unique_dates = set(ex['date']for ex in expenses)
+    total_spent = sum(int(ex['amount']) for ex in expenses)
+    avg_spending = total_spent/len(unique_dates)
+
+    print(f"Average daily spending is : ${avg_spending:.2f}")
+    return avg_spending
+    
+def highest_expense():
+    if not expenses:
+        print("No expenses to calculate")
+        return 0
+    highest = max(expenses, key=lambda x :int(x ['amount']))
+    print(f"Highest Expense : {highest['description']} on {highest['date']} for {highest['amount']}")
+    return highest
+
+def lowest_expense():
+    if not expenses:
+        print("No expenses to calculate")
+        return 0
+    lowest = min(expenses, key=lambda x :int(x ['amount']))
+    print(f"Lowest Expense : {lowest['description']} on {lowest['date']} for {lowest['amount']}")
+    return lowest
+
+def summery_menu():
+    while True:
+        print("\n---------Summery Report---------")
+        print("1. Total Spending")
+        print("2. Spending by date")
+        print("3. Spending by category")
+        print("4. Average Daily spending")
+        print("5. Highest Expense")
+        print("6. Lowest Expense")
+        print("7. Back to main menu")
+
+        choise = input("Enter your choice : ")
+        if choise =='1':
+            total_expenses()
+        elif choise =='2':
+            date = input("Enter date (YYYY-MM-DD) : ")
+            spending_by_date(date)
+        elif choise == '3':
+            spending_by_category()
+        elif choise == '4':
+            avg_daily_spending()
+        elif choise =='5':
+            highest_expense()
+        elif choise == '6':
+            lowest_expense()
+        elif choise == '7':
+            break
+        else:
+            print("Invalid choice. Please try again.")
+    

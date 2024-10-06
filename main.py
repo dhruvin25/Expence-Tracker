@@ -12,15 +12,17 @@ def main():
             date = input("Enter date(YYYY-MM-DD) : ")
             amount = input("Enter amount : ")
             description = input("Enter description : ")
-            fn.add_expense(date,amount,description)
+            fn.add_expense(expense_id_counter,date,amount,description)
             
         elif choice == '2':
             expense_id = input("Enter id : ")
             new_date = input("Enter new date(YYYY-MM-DD) : ")
             new_amount = input("Enter new  amount : ")
             new_description = input("Enter new description : ")
-            fn.edit_expense(expense_id,new_date,new_amount,new_description)
-            
+            result = fn.edit_expense(expense_id,new_date,new_amount,new_description)
+            if result == 0:
+                print(f"No records Found in {expense_id}")
+
         elif choice == '3':
             expense_id = input("Enter id : ")
             fn.delete_expense(expense_id)
@@ -34,6 +36,8 @@ def main():
         elif choice == '6':
             fn.total_expenses()
         elif choice == '7':
+            fn.summery_menu()
+        elif choice == '8':
             break
         else:
             print("Invalid choice")
